@@ -35,7 +35,7 @@ func clearscreen() {
 }
 
 func Println(message string) {
-	baudprint.BaudPrint(message, int64(baudrate))
+	baudprint.BaudPrint(message, int64(baudrate), 3, false, false)
 	fmt.Printf("\n")
 }
 
@@ -78,7 +78,7 @@ func logon_prompt() {
 	} else if message == "help games" {
 		help_games_lines[0] = "\n"
 		help_games_lines[1] = "`GAMES` REFERS TO MODELS, SIMULATIONS AND GAMES"
-		help_games_lines[2] = "WHICH HAVE TACTICAL AND STRATEGIC APPLICATIONS."
+		help_games_lines[2] = "WHICH HAVE TACTICAL AND STRATEGIC APPLICATIONS.\n"
 		help_games_lines[3] = "\n"
 		help_games_lines[4] = "List Games\n"
 		help_games_lines[5] = "FALKEN'S MAZE"

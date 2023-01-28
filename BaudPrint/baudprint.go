@@ -6,16 +6,21 @@ import (
 	"time"
 )
 
-func BaudPrint(message string, baudrate int64) {
-	variability := 3
-	min := int(baudrate) / variability
-	max := int(baudrate) * variability
+func BaudPrint(message string, baudrate int64, variability int, playmp3 bool, playaiff bool) {
+
+	max_rnd := int(baudrate) / variability
+	min_rnd := int(baudrate) * variability
+
 	for _, v := range message {
-		rbr := rand.Intn(max-min) + min
+		rbr := rand.Intn(min_rnd-max_rnd) + max_rnd
 		time.Sleep(time.Duration(time.Second / time.Duration(rbr)))
 
-		//Playmp3("./BaudPrint/baud.mp3")
-		//Play("./BaudPrint/baud.aiff")
+		if playmp3 {
+			Playmp3("./BaudPrint/baud.mp3")
+		} else if playaiff {
+			Play("./BaudPrint/baud.aiff")
+		}
+
 		fmt.Printf(string(v))
 	}
 }
