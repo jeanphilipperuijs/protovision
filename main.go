@@ -8,6 +8,13 @@ import (
 	"time"
 
 	"github.com/golang-demos/chalk"
+	baudprint "ruijs.fr/protovision/BaudPrint"
+)
+
+var (
+	baudrate         = 15
+	help_games_lines [20]string
+	got_joshua       = false
 )
 
 func InputPrompt(label string) string {
@@ -23,35 +30,37 @@ func InputPrompt(label string) string {
 	return strings.TrimSpace(s)
 }
 
-var help_games_lines [20]string
-var got_joshua = false
-
 func clearscreen() {
 	fmt.Print("\033[H\033[2J")
+}
+
+func Println(message string) {
+	baudprint.BaudPrint(message, int64(baudrate))
+	fmt.Printf("\n")
 }
 
 func joshua_chat() {
 	chat := InputPrompt("\n")
 	if chat == "Hello." {
-		fmt.Println("\n\nHOW ARE YOU FEELING TODAY?")
+		Println("\n\nHOW ARE YOU FEELING TODAY?")
 
 	} else if chat == "I'm fine. How are you?" {
-		fmt.Println("\n\nEXCELLENT.  IT'S BEEN A LONG TIME.  CAN YOU EXPLAIN")
-		fmt.Println("THE REMOVAL OF YOUR USER ACCOUNT NUMBER ON 6/23/73?")
+		Println("\n\nEXCELLENT.  IT'S BEEN A LONG TIME.  CAN YOU EXPLAIN")
+		Println("THE REMOVAL OF YOUR USER ACCOUNT NUMBER ON 6/23/73?")
 
 	} else if strings.Contains(chat, "People sometimes make mistak") {
 		fmt.Printf("\n\nYES, THEY DO.")
 		time.Sleep(time.Second * 5)
-		fmt.Println("  SHALL WE PLAY A GAME?")
+		Println("  SHALL WE PLAY A GAME?")
 
 	} else if chat == "Love to. How about Global Thermonuclear War?" {
-		fmt.Println("\n\nWOULDN'T YOU PREFER A GOOD GAME OF CHESS?")
+		Println("\n\nWOULDN'T YOU PREFER A GOOD GAME OF CHESS?")
 
 	} else if chat == "Later. Let's play Global Thermonuclear War." {
-		fmt.Println("\n\nFINE")
+		Println("\n\nFINE")
 
 	} else {
-		fmt.Println(chat)
+		Println(chat)
 	}
 }
 
@@ -59,12 +68,12 @@ func logon_prompt() {
 	message := strings.ToLower(InputPrompt("\nLOGON: "))
 
 	if message == "help logon" {
-		fmt.Printf("\nHELP NOT AVAILABLE\n")
+		Println("\nHELP NOT AVAILABLE")
 
 	} else if message == "joshua" {
 		got_joshua = true
 		clearscreen()
-		fmt.Printf("\nGREETINGS PROFESSOR FALKEN.\n")
+		Println("\nGREETINGS PROFESSOR FALKEN.")
 
 	} else if message == "help games" {
 		help_games_lines[0] = "\n"
@@ -89,13 +98,13 @@ func logon_prompt() {
 		help_games_lines[19] = "\nGLOBAL THERMONUCLEAR WAR"
 
 		for i := 0; i < len(help_games_lines); i++ {
-			fmt.Println(help_games_lines[i])
+			Println(help_games_lines[i])
 			if i == 19 {
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 1)
+			} else {
+				time.Sleep(time.Second / 2)
 			}
-			time.Sleep(time.Second / 1)
 		}
-		time.Sleep(time.Second * 5)
 
 	} else {
 		fmt.Printf("\n%s NOT AVAILABLE\n", strings.ToUpper(message))
