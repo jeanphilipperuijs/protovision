@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"strings"
@@ -11,161 +13,25 @@ import (
 
 	"github.com/golang-demos/chalk"
 	baudprint "ruijs.fr/protovision/BaudPrint"
+	conversation "ruijs.fr/protovision/Conversation"
 )
-
-type InputOutput struct {
-	Input      string
-	Output     []string
-	PreAction  string
-	PostAction string
-	UnLocks    string
-	NeedGame   bool
-	NeedJoshua bool
-}
 
 var (
-	baudrate         int = 25
-	variability      int = 5
-	got_joshua           = false
-	got_games            = false
-	start            time.Time
-	prompt           = "\nLOGON: "
-	chat_lines_logon = []InputOutput{
-		{
-			Input:  "Help Logon",
-			Output: []string{"\nHELP NOT AVAILABLE"},
-		},
-		{
-			Input: "Help games",
-			Output: []string{
-				"\n",
-				"`GAMES` REFERS TO MODELS, SIMULATIONS AND GAMES",
-				"WHICH HAVE TACTICAL AND STRATEGIC APPLICATIONS.\n",
-			},
-			PostAction: "noprompt",
-			UnLocks:    "games",
-		},
-		{
-			Input: "List games",
-			Output: []string{
-				"\n", "FALKEN'S MAZE",
-				"BLACK JACK",
-				"GIN RUMMY",
-				"HEARTS",
-				"BRIDGE",
-				"CHECKERS",
-				"CHESS",
-				"POKER",
-				"FIGHTER COMBAT",
-				"GUERRILLA ENGAGEMENT",
-				"DESERT WARFARE",
-				"AIR-TO-GROUND ACTIONS",
-				"THEATERWIDE TACTICAL WARFARE",
-				"THEATERWIDE BIOTOXIC AND CHEMICAL WARFARE",
-				"\nGLOBAL THERMONUCLEAR WAR",
-			},
-			NeedGame: true,
-		},
-		{
-			Input: "Armageddon",
-			Output: []string{
-				"IDENTIFICATION NOT RECOGNIZED BY SYSTEM",
-				"--CONNECTION-TERMINATED__"},
-			PostAction: "exit",
-		},
-		{
-			Input: "joshua",
-			Output: []string{
-				"\n",
-				"GREETINGS PROFESSOR FALKEN.",
-			},
-			UnLocks:   "joshua",
-			PreAction: "clear",
-		},
-		{
-			Input: "7KQ201 McKittrick",
-			Output: []string{
-				"** IDENTIFICATION NOT RECOGNIZED **",
-				"\n",
-				"** ACCESS DENIED **",
-			},
-			PostAction: "exit",
-		},
-	}
-	chat_lines_joshua = []InputOutput{
-		{
-			Input:      "clear",
-			Output:     []string{"\n\nBRB"},
-			PostAction: "clear",
-		},
-		{
-			Input:  "Hello.",
-			Output: []string{"\n\nHOW ARE YOU FEELING TODAY?"},
-		},
-		{
-			Input:  "I'm fine. How are you?",
-			Output: []string{"\n\nEXCELLENT.  IT'S BEEN A LONG TIME.  CAN YOU EXPLAIN", "THE REMOVAL OF YOUR USER ACCOUNT NUMBER ON 6/23/73?"},
-		},
-		{
-			Input:  "People sometimes make mistakes",
-			Output: []string{"\n\nYES, THEY DO.  SHALL WE PLAY A GAME?"},
-		},
-		{
-			Input:  "Love to. How about Global Thermonuclear War?",
-			Output: []string{"\n\nWOULDN'T YOU PREFER A GOOD GAME OF CHESS?"},
-		},
-		{
-			Input:  "Later. Let's play Global Thermonuclear War.",
-			Output: []string{"\n\nFINE"}, /*	`
-					,__                                                  _,
-					\~\|  ~~---___              ,                          | \
-					| Wash./ |   ~~~~~~~|~~~~~| ~~---,                VT_/,ME>
-				/~-_--__| |  Montana |N Dak\ Minn/ ~\~~/Mich.     /~| ||,'
-				|Oregon /  \         |------|   { WI / /~)     __-NY',|_\,NH
-				/       |Ida.|~~~~~~~~|S Dak.\    \   | | '~\  |_____,|~,-'Mass.
-				|~~--__ |    | Wyoming|____  |~~~~~|--| |__ /_-'Penn.{,~Conn (RI)
-				|   |  ~~~|~~|        |    ~~\ Iowa/  '-' |'~ |~_____{/NJ
-				|   |     |  '---------, Nebr.\----| IL|IN|OH,' ~/~\,|'MD (DE)
-				',  \ Nev.|Utah| Colo. |~~~~~~~|    \  | ,'~~\WV/ VA |
-				|Cal\    |    |       | Kansas| MO  \_-~ KY /'~___--\
-				',   \  ,-----|-------+-------'_____/__----~~/N Car./
-					'_   '\|     |      |~~~|Okla.|    | Tenn._/-,~~-,/
-					\    |Ariz.| New  |   |_    |Ark./~~|~~\    \,/S Car.
-					~~~-'     | Mex. |     '~~~\___|MS |AL | GA /
-						'-,_  | _____|          |  /   | ,-'---~\
-							´~'~  \    Texas    |LA'--,~~~~-~~,FL\
-									\/~\      /~~~'---'         |  \
-										\    /                   \  |
-										\  |                     '\'
-											'~'`,*/
+	baudrate    int = 25
+	variability int = 5
+	load        bool
+	got_joshua  = false
+	got_games   = false
+	start       time.Time
+	prompt      = "\nLOGON: "
 
-			PostAction: "hack",
-		},
-		{
-			Input:      "bye",
-			Output:     []string{"\n\nHOPE TO SEE YOU SOON", "BYE"},
-			PostAction: "exit",
-		},
-		{
-			Input:      "wargames",
-			Output:     []string{"\n\nNICE MOVIE", "SOON IN A THEATER NEAR YOU"},
-			PostAction: "exit",
-		},
-		{
-			Input: "CPE1704TKS",
-			Output: []string{
-				"A STRANGE GAME",
-				"THE ONLY WINNING MOVE IS",
-				"NOT TO PLAY.",
-				"\n",
-				"HOW ABOUT A NICE GAME OF CHESS?",
-			},
-			PostAction: "exit",
-		},
-	}
+	filename_joshua                              = "joshua.json"
+	filename_logon                               = "logon.json"
+	chat_lines_logon  []conversation.InputOutput = conversation.ChatlinesLogon
+	chat_lines_joshua []conversation.InputOutput = conversation.ChatlinesJoshua
 )
 
-func InputPrompt(label string) string {
+func inputPrompt(label string) string {
 	var s string
 	r := bufio.NewReader(os.Stdin)
 	for {
@@ -185,15 +51,18 @@ func clearscreen() {
 func writeLine(input string) {
 	baudprint.BaudPrint(input, int64(baudrate), int(variability), false, false)
 	fmt.Printf("\n")
+	log.Printf("writeLine '%s'\n", input)
 }
 
 func check_input(prompt_input string, known_input string) bool {
+	ret := false
 	if len(prompt_input) > 2 {
 		prompt_input_lower := strings.ToLower(prompt_input)
 		known_input_lower := strings.ToLower(known_input)
-		return prompt_input_lower == known_input_lower || strings.Contains(known_input_lower, prompt_input_lower) || strings.Contains(prompt_input_lower, known_input_lower)
+		ret = prompt_input_lower == known_input_lower || strings.Contains(known_input_lower, prompt_input_lower) || strings.Contains(prompt_input_lower, known_input_lower)
 	}
-	return false
+	log.Printf("'%t' comparing user input vs known: '%s' with known input '%s'", ret, prompt_input, known_input)
+	return ret
 }
 
 func randomString(charset string, n int) string {
@@ -220,18 +89,19 @@ func hackNuclearCodes() {
 	baudrate = 300
 	if code == "JPE1704TKS" || code == "CPE1704TKS" {
 		writeLine("FOUND " + code)
-		fmt.Printf("%s took %v\n", code, time.Since(start))
+		log.Printf("%s took %v\n", code, time.Since(start))
 		os.Exit(0)
 	}
 
 	//baudprint.BaudPrint(code, 1000, 1, false, false)
 }
+
 func chat_joshua() {
-	prompt_input := InputPrompt("\n")
+	prompt_input := inputPrompt("\n")
 
 	gave_output := false
 	for _, interaction := range chat_lines_joshua {
-
+		log.Printf(interaction.Input)
 		if check_input(prompt_input, interaction.Input) {
 			switch interaction.PreAction {
 			default:
@@ -267,7 +137,7 @@ func chat_joshua() {
 }
 
 func chat_logon() {
-	prompt_input := InputPrompt(prompt)
+	prompt_input := inputPrompt(prompt)
 
 	gave_output := false
 
@@ -313,17 +183,74 @@ func chat_logon() {
 
 	if !gave_output {
 		fmt.Printf("\n%s NOT AVAILABLE\n", strings.ToUpper(prompt_input))
-
 	}
 }
 
+func loadConversations() {
+	contentLogon, err := os.ReadFile(filename_logon)
+	if err != nil {
+		log.Printf("Error when opening file '%s'\n", filename_logon)
+		chat_lines_logon = conversation.ChatlinesLogon
+		saveLogon()
+	} else {
+		log.Printf("Loaded LOGON conversation from file '%s'\n", filename_logon)
+
+		err = json.Unmarshal(contentLogon, &chat_lines_logon)
+		if err != nil {
+			log.Fatal("Error during Unmarshal(): ", err)
+		}
+	}
+
+	contentJoshua, err := os.ReadFile(filename_joshua)
+	if err != nil {
+		log.Printf("Error when opening file '%s'\n", filename_logon)
+		chat_lines_joshua = conversation.ChatlinesJoshua
+		saveJoshua()
+	} else {
+		log.Printf("Loaded JOSHUA conversation from file '%s'\n", filename_logon)
+		err = json.Unmarshal(contentJoshua, &chat_lines_joshua)
+		if err != nil {
+			log.Fatal("Error during Unmarshal(): ", err)
+		}
+	}
+
+}
+func saveLogon() {
+	file, _ := json.MarshalIndent(conversation.ChatlinesLogon, "", " ")
+	_ = os.WriteFile("logon.json", file, 0644)
+}
+
+func saveJoshua() {
+	file, _ := json.MarshalIndent(conversation.ChatlinesJoshua, "", " ")
+	_ = os.WriteFile("joshua.json", file, 0644)
+}
+func setup_logging() {
+	f, err := os.OpenFile("protovision.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//defer to close when you're done with it, not because you think it's idiomatic!
+	//defer f.Close()
+
+	//set output of logs to f
+	log.SetOutput(f)
+
+	//test case
+	log.Println("ProtoVision, I have you know!")
+}
 func main() {
 
-	flag.IntVar(&baudrate, "bd", 20, "Specify baud rate.")
-	flag.IntVar(&variability, "var", 3, "Specify variability.")
-	//flag.StringVar(&pass, "p", "password", "Specify pass. Default is password")
+	setup_logging()
 
+	flag.IntVar(&baudrate, "bd", 300, "Specify baud rate.")
+	flag.IntVar(&variability, "var", 30, "Specify variability.")
+	flag.BoolVar(&load, "load", false, "Load conversation from files")
 	flag.Parse() // after declaring flags we need to call it
+
+	if load {
+		loadConversations()
+	}
 
 	if baudrate < variability {
 		fmt.Println("baudrate should be bigger then [variability]", variability)
