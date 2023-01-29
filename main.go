@@ -205,8 +205,9 @@ func hackNuclearCodes() {
 	set3 := randomString(charset, 3)
 	code := set1 + set2 + set3
 	writeLine(code)
+	//fmt.Println(code)
 	baudrate = 300
-	if code == "JPE1704TKS" {
+	if code == "JPE1704TKS" || code == "CPE1704TKS" {
 		writeLine("FOUND " + code)
 		fmt.Printf("%s took %v\n", code, time.Since(start))
 		os.Exit(0)
