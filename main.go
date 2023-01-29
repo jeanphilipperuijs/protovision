@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/golang-demos/chalk"
 	baudprint "ruijs.fr/protovision/BaudPrint"
@@ -22,11 +24,11 @@ type InputOutput struct {
 }
 
 var (
-	baudrate    int = 25
-	variability int = 5
-	got_joshua      = false
-	got_games       = false
-
+	baudrate         int = 25
+	variability      int = 5
+	got_joshua           = false
+	got_games            = false
+	start            time.Time
 	prompt           = "\nLOGON: "
 	chat_lines_logon = []InputOutput{
 		{
@@ -65,15 +67,29 @@ var (
 			NeedGame: true,
 		},
 		{
-			Input:      "Armageddon",
-			Output:     []string{"IDENTIFICATION NOT RECOGNIZED BY SYSTEM", "--CONNECTION-TERMINATED__"},
+			Input: "Armageddon",
+			Output: []string{
+				"IDENTIFICATION NOT RECOGNIZED BY SYSTEM",
+				"--CONNECTION-TERMINATED__"},
 			PostAction: "exit",
 		},
 		{
-			Input:     "joshua",
-			Output:    []string{"\nGREETINGS PROFESSOR FALKEN."},
+			Input: "joshua",
+			Output: []string{
+				"\n",
+				"GREETINGS PROFESSOR FALKEN.",
+			},
 			UnLocks:   "joshua",
 			PreAction: "clear",
+		},
+		{
+			Input: "7KQ201 McKittrick",
+			Output: []string{
+				"** IDENTIFICATION NOT RECOGNIZED **",
+				"\n",
+				"** ACCESS DENIED **",
+			},
+			PostAction: "exit",
 		},
 	}
 	chat_lines_joshua = []InputOutput{
@@ -99,33 +115,40 @@ var (
 			Output: []string{"\n\nWOULDN'T YOU PREFER A GOOD GAME OF CHESS?"},
 		},
 		{
-			Input: "Later. Let's play Global Thermonuclear War.",
-			Output: []string{"\n\nFINE", `
-	,__                                                  _,
-	\~\|  ~~---___              ,                          | \
-	| Wash./ |   ~~~~~~~|~~~~~| ~~---,                VT_/,ME>
-/~-_--__| |  Montana |N Dak\ Minn/ ~\~~/Mich.     /~| ||,'
-|Oregon /  \         |------|   { WI / /~)     __-NY',|_\,NH
-/       |Ida.|~~~~~~~~|S Dak.\    \   | | '~\  |_____,|~,-'Mass.
-|~~--__ |    | Wyoming|____  |~~~~~|--| |__ /_-'Penn.{,~Conn (RI)
-|   |  ~~~|~~|        |    ~~\ Iowa/  '-' |'~ |~_____{/NJ
-|   |     |  '---------, Nebr.\----| IL|IN|OH,' ~/~\,|'MD (DE)
-',  \ Nev.|Utah| Colo. |~~~~~~~|    \  | ,'~~\WV/ VA |
-|Cal\    |    |       | Kansas| MO  \_-~ KY /'~___--\
-',   \  ,-----|-------+-------'_____/__----~~/N Car./
-	'_   '\|     |      |~~~|Okla.|    | Tenn._/-,~~-,/
-	\    |Ariz.| New  |   |_    |Ark./~~|~~\    \,/S Car.
-	~~~-'     | Mex. |     '~~~\___|MS |AL | GA /
-		'-,_  | _____|          |  /   | ,-'---~\
-			´~'~  \    Texas    |LA'--,~~~~-~~,FL\
-					\/~\      /~~~'---'         |  \
-						\    /                   \  |
-						\  |                     '\'
-							'~'`},
+			Input:  "Later. Let's play Global Thermonuclear War.",
+			Output: []string{"\n\nFINE"}, /*	`
+					,__                                                  _,
+					\~\|  ~~---___              ,                          | \
+					| Wash./ |   ~~~~~~~|~~~~~| ~~---,                VT_/,ME>
+				/~-_--__| |  Montana |N Dak\ Minn/ ~\~~/Mich.     /~| ||,'
+				|Oregon /  \         |------|   { WI / /~)     __-NY',|_\,NH
+				/       |Ida.|~~~~~~~~|S Dak.\    \   | | '~\  |_____,|~,-'Mass.
+				|~~--__ |    | Wyoming|____  |~~~~~|--| |__ /_-'Penn.{,~Conn (RI)
+				|   |  ~~~|~~|        |    ~~\ Iowa/  '-' |'~ |~_____{/NJ
+				|   |     |  '---------, Nebr.\----| IL|IN|OH,' ~/~\,|'MD (DE)
+				',  \ Nev.|Utah| Colo. |~~~~~~~|    \  | ,'~~\WV/ VA |
+				|Cal\    |    |       | Kansas| MO  \_-~ KY /'~___--\
+				',   \  ,-----|-------+-------'_____/__----~~/N Car./
+					'_   '\|     |      |~~~|Okla.|    | Tenn._/-,~~-,/
+					\    |Ariz.| New  |   |_    |Ark./~~|~~\    \,/S Car.
+					~~~-'     | Mex. |     '~~~\___|MS |AL | GA /
+						'-,_  | _____|          |  /   | ,-'---~\
+							´~'~  \    Texas    |LA'--,~~~~-~~,FL\
+									\/~\      /~~~'---'         |  \
+										\    /                   \  |
+										\  |                     '\'
+											'~'`,*/
+
+			PostAction: "hack",
 		},
 		{
 			Input:      "bye",
 			Output:     []string{"\n\nHOPE TO SEE YOU SOON", "BYE"},
+			PostAction: "exit",
+		},
+		{
+			Input:      "wargames",
+			Output:     []string{"\n\nNICE MOVIE", "SOON IN A THEATER NEAR YOU"},
 			PostAction: "exit",
 		},
 	}
@@ -162,6 +185,34 @@ func check_input(prompt_input string, known_input string) bool {
 	return false
 }
 
+func randomString(charset string, n int) string {
+	sb := strings.Builder{}
+	sb.Grow(n)
+	for i := 0; i < n; i++ {
+		sb.WriteByte(charset[rand.Intn(len(charset))])
+	}
+	return sb.String()
+}
+
+func hackNuclearCodes() {
+	rand.Seed(time.Now().UnixNano())
+	//rand.Seed(time.Now().Unix())
+
+	charset := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	numset := "0123456789"
+	set1 := randomString(charset, 3)
+	set2 := randomString(numset, 4)
+	set3 := randomString(charset, 3)
+	code := set1 + set2 + set3
+	writeLine(code)
+	baudrate = 300
+	if code == "JPE1704TKS" {
+		writeLine("FOUND " + code)
+		fmt.Printf("%s took %v\n", code, time.Since(start))
+		os.Exit(0)
+	}
+	//baudprint.BaudPrint(code, 1000, 1, false, false)
+}
 func chat_joshua() {
 	prompt_input := InputPrompt("\n")
 
@@ -182,6 +233,14 @@ func chat_joshua() {
 				clearscreen()
 			case "exit":
 				os.Exit(0)
+			case "hack":
+				clearscreen()
+				fmt.Print("\033[s")
+				start = time.Now()
+				for {
+					fmt.Print("\033[u\033[K")
+					hackNuclearCodes()
+				}
 			default:
 				break
 			}

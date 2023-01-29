@@ -24,5 +24,7 @@ func BaudPrint(message string, baudrate int64, variability int, playmp3 bool, pl
 
 		fmt.Printf(string(v))
 	}
-	time.Sleep(time.Duration(time.Second / 2))
+	//time.Sleep(time.Duration(time.Second / 2))
+	time.Sleep(time.Duration(time.Duration(1 / baudrate)))
+
 }
