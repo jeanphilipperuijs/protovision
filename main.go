@@ -151,6 +151,15 @@ var (
 			Output:     []string{"\n\nNICE MOVIE", "SOON IN A THEATER NEAR YOU"},
 			PostAction: "exit",
 		},
+		{
+			Input: "CPE1704TKS",
+			Output: []string{
+				"A STRANGE GAME",
+				"THE ONLY WINNING MOVE IS",
+				"NOT TO PLAY.",
+			},
+			PostAction: "exit",
+		},
 	}
 )
 
@@ -212,6 +221,7 @@ func hackNuclearCodes() {
 		fmt.Printf("%s took %v\n", code, time.Since(start))
 		os.Exit(0)
 	}
+
 	//baudprint.BaudPrint(code, 1000, 1, false, false)
 }
 func chat_joshua() {
