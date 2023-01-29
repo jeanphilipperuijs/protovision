@@ -17,7 +17,13 @@ go mod tidy
 ___
 ## build
 
+
+
 ```bash
+sudo apt install portaudio19-dev
+sudo apt install libmpg123-dev
+
+
 go build -o protovision
 ```
 ___
