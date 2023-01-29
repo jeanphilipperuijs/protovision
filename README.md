@@ -35,10 +35,12 @@ ___
 
 ## arguments
 
-    Usage of ./prototype
+    Usage of ./protovision_amd64:
     -bd int
-            Specify baud rate. (default 20)
+            Specify baud rate. (default 300)
+    -export
+            Export default conversations from files 'logon.json' and 'joshua.json'
     -load
-            Load conversation from files
+            Load conversation from files 'logon.json' and 'joshua.json'
     -var int
-            Specify variability. (default 3)
+            Specify variability. (default 30)
