@@ -31,3 +31,14 @@ ___
 ```bash
 ./protovision
 ```
+
+
+## arguments
+
+    Usage of ./prototype
+    -bd int
+            Specify baud rate. (default 20)
+    -load
+            Load conversation from files
+    -var int
+            Specify variability. (default 3)

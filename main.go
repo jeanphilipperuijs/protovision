@@ -17,16 +17,19 @@ import (
 )
 
 var (
-	baudrate    int = 25
-	variability int = 5
-	load        bool
-	got_joshua  = false
-	got_games   = false
-	start       time.Time
-	prompt      = "\nLOGON: "
+	// modifiable thrue args
+	baudrate        int  = 300
+	variability     int  = 30
+	load            bool = false
+	export          bool = false
+	filename_joshua      = "joshua.json"
+	filename_logon       = "logon.json"
 
-	filename_joshua                              = "joshua.json"
-	filename_logon                               = "logon.json"
+	got_joshua = false
+	got_games  = false
+	start      time.Time
+	prompt     = "\nLOGON: "
+
 	chat_lines_logon  []conversation.InputOutput = conversation.ChatlinesLogon
 	chat_lines_joshua []conversation.InputOutput = conversation.ChatlinesJoshua
 )
@@ -185,45 +188,43 @@ func chat_logon() {
 		fmt.Printf("\n%s NOT AVAILABLE\n", strings.ToUpper(prompt_input))
 	}
 }
+func loadConversation(filename string, conv []conversation.InputOutput) []conversation.InputOutput {
+	chat_lines := conv
+	contentLogon, err := os.ReadFile(filename)
+	if err != nil {
+		log.Printf("Error when opening file '%s'\n", filename_logon)
+		chat_lines = conv
+		exportConversation(filename, conv)
+	} else {
+		log.Printf("Loaded conversation from file '%s'\n", filename_logon)
+
+		err = json.Unmarshal(contentLogon, &chat_lines)
+		if err != nil {
+			log.Fatal("Error during Unmarshal(): ", err)
+		}
+	}
+	return chat_lines
+}
 
 func loadConversations() {
-	contentLogon, err := os.ReadFile(filename_logon)
-	if err != nil {
-		log.Printf("Error when opening file '%s'\n", filename_logon)
-		chat_lines_logon = conversation.ChatlinesLogon
-		saveLogon()
-	} else {
-		log.Printf("Loaded LOGON conversation from file '%s'\n", filename_logon)
-
-		err = json.Unmarshal(contentLogon, &chat_lines_logon)
-		if err != nil {
-			log.Fatal("Error during Unmarshal(): ", err)
-		}
-	}
-
-	contentJoshua, err := os.ReadFile(filename_joshua)
-	if err != nil {
-		log.Printf("Error when opening file '%s'\n", filename_logon)
-		chat_lines_joshua = conversation.ChatlinesJoshua
-		saveJoshua()
-	} else {
-		log.Printf("Loaded JOSHUA conversation from file '%s'\n", filename_logon)
-		err = json.Unmarshal(contentJoshua, &chat_lines_joshua)
-		if err != nil {
-			log.Fatal("Error during Unmarshal(): ", err)
-		}
-	}
-
-}
-func saveLogon() {
-	file, _ := json.MarshalIndent(conversation.ChatlinesLogon, "", " ")
-	_ = os.WriteFile("logon.json", file, 0644)
+	chat_lines_logon = loadConversation(filename_logon, conversation.ChatlinesLogon)
+	chat_lines_joshua = loadConversation(filename_joshua, conversation.ChatlinesJoshua)
 }
 
-func saveJoshua() {
-	file, _ := json.MarshalIndent(conversation.ChatlinesJoshua, "", " ")
-	_ = os.WriteFile("joshua.json", file, 0644)
+func exportConversation(filename string, conv []conversation.InputOutput) {
+	log.Printf("Exporting logon conversation to '%s'", filename)
+	file, _ := json.MarshalIndent(conv, "", "  ")
+	_ = os.WriteFile(filename, file, 0644)
 }
+
+func exportconvLogon() {
+	exportConversation(filename_logon, conversation.ChatlinesLogon)
+}
+
+func exportConvJoshua() {
+	exportConversation(filename_joshua, conversation.ChatlinesJoshua)
+}
+
 func setup_logging() {
 	f, err := os.OpenFile("protovision.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
@@ -233,7 +234,6 @@ func setup_logging() {
 	//defer to close when you're done with it, not because you think it's idiomatic!
 	//defer f.Close()
 
-	//set output of logs to f
 	log.SetOutput(f)
 
 	//test case
@@ -243,15 +243,20 @@ func main() {
 
 	setup_logging()
 
-	flag.IntVar(&baudrate, "bd", 300, "Specify baud rate.")
-	flag.IntVar(&variability, "var", 30, "Specify variability.")
-	flag.BoolVar(&load, "load", false, "Load conversation from files")
+	flag.IntVar(&baudrate, "bd", baudrate, "Specify baud rate.")
+	flag.IntVar(&variability, "var", variability, "Specify variability.")
+	flag.BoolVar(&load, "load", load, fmt.Sprintf("Load conversation from files '%s' and '%s'", filename_logon, filename_joshua))
+	flag.BoolVar(&export, "export", export, fmt.Sprintf("Export default conversations from files '%s' and '%s'", filename_logon, filename_joshua))
 	flag.Parse() // after declaring flags we need to call it
 
 	if load {
 		loadConversations()
 	}
-
+	if export {
+		exportconvLogon()
+		exportConvJoshua()
+		os.Exit(0)
+	}
 	if baudrate < variability {
 		fmt.Println("baudrate should be bigger then [variability]", variability)
 		os.Exit(1)
