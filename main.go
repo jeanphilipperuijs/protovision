@@ -226,7 +226,8 @@ func exportConvJoshua() {
 }
 
 func setup_logging() {
-	f, err := os.OpenFile("protovision.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	t := time.Now()
+	f, err := os.OpenFile(t.Format("2006-01-02_150405")+".log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
