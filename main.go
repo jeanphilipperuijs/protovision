@@ -188,6 +188,7 @@ func chat_logon() {
 		fmt.Printf("\n%s NOT AVAILABLE\n", strings.ToUpper(prompt_input))
 	}
 }
+
 func loadConversation(filename string, conv []conversation.InputOutput) []conversation.InputOutput {
 	chat_lines := conv
 	contentLogon, err := os.ReadFile(filename)

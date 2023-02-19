@@ -1,0 +1,108 @@
+[
+  {
+    "input": "clear",
+    "output": [
+      "\n\nBRB"
+    ],
+    "pre_action": "",
+    "post_action": "clear",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "Hello.",
+    "output": [
+      "\n\nHOW ARE YOU FEELING TODAY?"
+    ],
+    "pre_action": "",
+    "post_action": "",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "I'm fine. How are you?",
+    "output": [
+      "\n\nEXCELLENT.  IT'S BEEN A LONG TIME.  CAN YOU EXPLAIN",
+      "THE REMOVAL OF YOUR USER ACCOUNT NUMBER ON 6/23/73?"
+    ],
+    "pre_action": "",
+    "post_action": "",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "People sometimes make mistakes",
+    "output": [
+      "\n\nYES, THEY DO.  SHALL WE PLAY A GAME?"
+    ],
+    "pre_action": "",
+    "post_action": "",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "Love to. How about Global Thermonuclear War?",
+    "output": [
+      "\n\nWOULDN'T YOU PREFER A GOOD GAME OF CHESS?"
+    ],
+    "pre_action": "",
+    "post_action": "",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "Later. Let's play Global Thermonuclear War.",
+    "output": [
+      "\n\nFINE"
+    ],
+    "pre_action": "",
+    "post_action": "hack",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "bye",
+    "output": [
+      "\n\nHOPE TO SEE YOU SOON",
+      "BYE"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "wargames",
+    "output": [
+      "\n\nNICE MOVIE",
+      "SOON IN A THEATER NEAR YOU"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "CPE1704TKS",
+    "output": [
+      "A STRANGE GAME",
+      "THE ONLY WINNING MOVE IS",
+      "NOT TO PLAY.",
+      "\n",
+      "HOW ABOUT A NICE GAME OF CHESS?"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  }
+]

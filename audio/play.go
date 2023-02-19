@@ -1,4 +1,4 @@
-package baudprint
+package audio
 
 import (
 	"encoding/binary"

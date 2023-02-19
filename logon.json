@@ -1,0 +1,89 @@
+[
+  {
+    "input": "Help Logon",
+    "output": [
+      "\nHELP NOT AVAILABLE"
+    ],
+    "pre_action": "",
+    "post_action": "",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "Help games",
+    "output": [
+      "\n",
+      "`GAMES` REFERS TO MODELS, SIMULATIONS AND GAMES",
+      "WHICH HAVE TACTICAL AND STRATEGIC APPLICATIONS.\n"
+    ],
+    "pre_action": "",
+    "post_action": "noprompt",
+    "unlocks": "games",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "List games",
+    "output": [
+      "\n",
+      "FALKEN'S MAZE",
+      "BLACK JACK",
+      "GIN RUMMY",
+      "HEARTS",
+      "BRIDGE",
+      "CHECKERS",
+      "CHESS",
+      "POKER",
+      "FIGHTER COMBAT",
+      "GUERRILLA ENGAGEMENT",
+      "DESERT WARFARE",
+      "AIR-TO-GROUND ACTIONS",
+      "THEATERWIDE TACTICAL WARFARE",
+      "THEATERWIDE BIOTOXIC AND CHEMICAL WARFARE",
+      "\nGLOBAL THERMONUCLEAR WAR"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": true,
+    "need_joshua": false
+  },
+  {
+    "input": "Armageddon",
+    "output": [
+      "IDENTIFICATION NOT RECOGNIZED BY SYSTEM",
+      "--CONNECTION-TERMINATED__"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "joshua",
+    "output": [
+      "\n",
+      "GREETINGS PROFESSOR FALKEN."
+    ],
+    "pre_action": "clear",
+    "post_action": "",
+    "unlocks": "joshua",
+    "need_game": false,
+    "need_joshua": false
+  },
+  {
+    "input": "7KQ201 McKittrick",
+    "output": [
+      "** IDENTIFICATION NOT RECOGNIZED **",
+      "\n",
+      "** ACCESS DENIED **"
+    ],
+    "pre_action": "",
+    "post_action": "exit",
+    "unlocks": "",
+    "need_game": false,
+    "need_joshua": false
+  }
+]
