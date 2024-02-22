@@ -72,23 +72,25 @@ func randomString(charset string, n int) string {
 	sb := strings.Builder{}
 	sb.Grow(n)
 	for i := 0; i < n; i++ {
-		sb.WriteByte(charset[rand.Intn(len(charset))])
+		source := rand.NewSource(time.Now().UnixNano())
+		rng := rand.New(source)
+		sb.WriteByte(charset[rng.Intn(len(charset))])
 	}
 	return sb.String()
 }
 
 func hackNuclearCodes() {
-	rand.Seed(time.Now().UnixNano())
-	//rand.Seed(time.Now().Unix())
-
 	charset := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	numset := "0123456789"
+
 	set1 := randomString(charset, 3)
 	set2 := randomString(numset, 4)
 	set3 := randomString(charset, 3)
+
 	code := set1 + set2 + set3
 	writeLine(code)
-	//fmt.Println(code)
+
+	//log.Println(code)
 	baudrate = 300
 	if code == "JPE1704TKS" || code == "CPE1704TKS" {
 		writeLine("FOUND " + code)
@@ -228,18 +230,25 @@ func exportConvJoshua() {
 
 func setup_logging() {
 	t := time.Now()
-	f, err := os.OpenFile(t.Format("2006-01-02_150405")+".log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+	f, err := os.OpenFile(t.Format("./2006-01-02_150405")+".log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		log.Fatal(err)
+		//log.Fatal(err)
+	} else {
+		log.SetOutput(f)
 	}
 
 	//defer to close when you're done with it, not because you think it's idiomatic!
 	//defer f.Close()
 
-	log.SetOutput(f)
-
 	//test case
 	log.Println("ProtoVision, I have you know!")
+}
+func hack_testmain() {
+	start = time.Now()
+	for {
+		fmt.Print("\033[u\033[K")
+		hackNuclearCodes()
+	}
 }
 func main() {
 

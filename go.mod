@@ -1,6 +1,6 @@
 module ruijs.fr/protovision
 
-go 1.19
+go 1.22
 
 require (
 	github.com/bobertlo/go-mpg123 v0.0.0-20211210004329-c83f21a0fd39
